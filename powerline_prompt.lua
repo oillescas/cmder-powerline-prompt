@@ -177,7 +177,26 @@ function colorful_git_prompt_filter()
     return false
 end
 
+function npm_prompt_filter()
+    local c = 6;
+    local colors = "\x1b[3"..c..";40m\x1b[30;4"..c.."m "
+    local closingcolors = "\x1b[3"..c..";40m"
+
+    local package = io.open('package.json')
+    if package ~= nil then
+        local package_info = package:read('*a')
+        package:close()
+        local package_name = string.match(package_info, '"name"%s*:%s*"(%g-)"')
+        local package_version = string.match(package_info, '"version"%s*:%s*"(.-)"')
+        local package_string = colors.."("..package_name.."@"..package_version..")"..closingcolors
+        clink.prompt.value = clink.prompt.value:gsub('{git}', '{git} '..package_string)
+    end
+    return false
+end
+
+
 -- override the built-in filters
 clink.prompt.register_filter(lambda_prompt_filter, 55)
+clink.prompt.register_filter(npm_prompt_filter, 55)
 clink.prompt.register_filter(colorful_hg_prompt_filter, 60)
 clink.prompt.register_filter(colorful_git_prompt_filter, 60)
