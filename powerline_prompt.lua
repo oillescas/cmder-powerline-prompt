@@ -183,7 +183,8 @@ end
 function npm_prompt_filter()
     local c = 6;
     local colors = "\x1b[3"..c..";40m\x1b[37;4"..c.."m "
-    local closingcolors = "\x1b[3"..c..";40m"
+    local middle = " \x1b[33;4"..c.."m\x1b[30;43m"
+    local closingcolors = "\x1b[33;40m"
 
     local package = io.open('package.json')
     if package ~= nil then
@@ -191,7 +192,7 @@ function npm_prompt_filter()
         package:close()
         local package_name = string.match(package_info, '"name"%s*:%s*"(%g-)"')
         local package_version = string.match(package_info, '"version"%s*:%s*"(.-)"')
-        local package_string = colors..package_name.."@"..package_version..closingcolors
+        local package_string = colors..package_name..middle..package_version..closingcolors
         clink.prompt.value = clink.prompt.value:gsub('{git}', '{git} '..package_string)
     end
     return false
