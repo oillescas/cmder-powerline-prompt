@@ -3,6 +3,9 @@
 -- Resets the prompt 
 function lambda_prompt_filter()
     cwd = clink.get_cwd()
+    if string.len(cwd) > 35 then
+        cwd = '…'..string.sub(cwd, string.len(cwd)-33)
+    end
     prompt = "\x1b[37;44m{cwd} {git}{hg}\n\x1b[1;30;40m{lamb} \x1b[0m"
     new_value = string.gsub(prompt, "{cwd}", cwd)
     clink.prompt.value = string.gsub(new_value, "{lamb}", "λ")
@@ -150,7 +153,7 @@ function colorful_git_prompt_filter()
 
     local closingcolors = {
         clean = " \x1b[32;40m",
-        dirty = "± \x1b[33;40m",
+        dirty = "✘ \x1b[33;40m",
     }
 
     local git_dir = get_git_dir()
@@ -167,7 +170,7 @@ function colorful_git_prompt_filter()
                 closingcolor = closingcolors.dirty
             end
 
-            clink.prompt.value = string.gsub(clink.prompt.value, "{git}", color..branch..closingcolor)
+            clink.prompt.value = string.gsub(clink.prompt.value, "{git}", color.." "..branch..closingcolor)
             return false
         end
     end
@@ -179,7 +182,7 @@ end
 
 function npm_prompt_filter()
     local c = 6;
-    local colors = "\x1b[3"..c..";40m\x1b[30;4"..c.."m "
+    local colors = "\x1b[3"..c..";40m\x1b[37;4"..c.."m "
     local closingcolors = "\x1b[3"..c..";40m"
 
     local package = io.open('package.json')
@@ -188,7 +191,7 @@ function npm_prompt_filter()
         package:close()
         local package_name = string.match(package_info, '"name"%s*:%s*"(%g-)"')
         local package_version = string.match(package_info, '"version"%s*:%s*"(.-)"')
-        local package_string = colors.."("..package_name.."@"..package_version..")"..closingcolors
+        local package_string = colors..package_name.."@"..package_version..closingcolors
         clink.prompt.value = clink.prompt.value:gsub('{git}', '{git} '..package_string)
     end
     return false
